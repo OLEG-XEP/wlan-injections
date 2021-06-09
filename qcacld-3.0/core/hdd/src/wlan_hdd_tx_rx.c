@@ -894,6 +894,8 @@ static netdev_tx_t __hdd_hard_start_xmit(struct sk_buff *skb,
 
 	STAId = HDD_WLAN_INVALID_STA_ID;
 
+	/* use self peer directly in monitor mode */
+	//if (QDF_MONITOR_MODE != cds_get_conparam()) {
 	hdd_get_transmit_sta_id(adapter, skb, &STAId);
 	if (STAId >= WLAN_MAX_STA_COUNT) {
 		QDF_TRACE(QDF_MODULE_ID_HDD_DATA, QDF_TRACE_LEVEL_INFO_HIGH,

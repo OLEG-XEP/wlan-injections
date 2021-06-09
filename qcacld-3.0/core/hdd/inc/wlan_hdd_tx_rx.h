@@ -312,4 +312,47 @@ hdd_skb_nontso_linearize(struct sk_buff *skb)
 }
 #endif
 
+/*----------------------------------------------------------------------------
+ * Function Declarations and Documentation
+ * -------------------------------------------------------------------------*/
+
+void *tlshim_peer_validity(void *cds_ctx, uint8_t sta_id);
+
+/**
+ * tlshim_selfpeer_vdev() - get vdev of self peer
+ * @vos_ctx             vos context
+ *
+ * Return: on success return vdev, NULL when self peer is invalid/NULL
+ */
+void *tlshim_selfpeer_vdev(void *cds_ctx);
+
+/*==========================================================================
+
+  FUNCTION    WLANTL_Open
+
+  DESCRIPTION
+    Called by HDD at driver initialization. TL will initialize all its
+    internal resources and will wait for the call to start to register
+    with the other modules.
+
+  DEPENDENCIES
+
+  PARAMETERS
+
+    IN
+    pvosGCtx:       pointer to the global vos context; a handle to TL's
+                    control block can be extracted from its context
+    pTLConfig:      TL Configuration
+
+  RETURN VALUE
+    The result code associated with performing the operation
+
+    VOS_STATUS_E_FAULT:  pointer to TL cb is NULL ; access would cause a page
+                         fault
+    VOS_STATUS_SUCCESS:  Everything is good :)
+
+  SIDE EFFECTS
+
+============================================================================*/
+
 #endif /* end #if !defined(WLAN_HDD_TX_RX_H) */

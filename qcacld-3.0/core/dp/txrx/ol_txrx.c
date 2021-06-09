@@ -2929,6 +2929,29 @@ static void ol_txrx_flush_cache_rx_queue(void)
 	}
 }
 
+/*
+ * tlshim_selfpeer_vdev() - get the vdev of self peer
+ * @vos_ctx: vos context
+ *
+ * Return: on success return vdev, NULL when self peer is invalid/NULL
+ */
+void *tlshim_selfpeer_vdev(void *cds_ctx)
+{
+	struct ol_txrx_pdev_t *pdev = cds_get_context(QDF_MODULE_ID_TXRX);
+	struct ol_txrx_peer_t *peer;
+
+	if (!pdev) {
+		return NULL;
+	}
+
+	peer = pdev->self_peer;
+	if (!peer) {
+		return NULL;
+	} else {
+		return peer->vdev;
+	}
+}
+
 /* Define short name to use in cds_trigger_recovery */
 #define PEER_DEL_TIMEOUT QDF_PEER_DELETION_TIMEDOUT
 

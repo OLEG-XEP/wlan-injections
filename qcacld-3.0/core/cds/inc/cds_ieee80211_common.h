@@ -2048,4 +2048,21 @@ struct ieee80211_ie_wide_bw_switch {
 
 #define IEEE80211_P2P_WILDCARD_SSID_LEN     (sizeof(IEEE80211_P2P_WILDCARD_SSID) - 1)
 
+/**
+ * struct ieee80211_radiotap_header - radio tap header
+ * @it_version: version 0
+ * @it_pad:     padding
+ * @it_len:     length of the whole header in bytes
+ * @it_present: bitmap telling which fields are present
+ *
+ * This struct is used to indicate rx status in monitor mode
+ * and carry tx parameters in packet injection.
+ */
+struct ieee80211_radiotap_header {
+	u_int8_t it_version;
+	u_int8_t it_pad;
+	u_int16_t it_len;
+	u_int32_t it_present;
+} __packed;
+
 #endif /* CDS_COMMON_IEEE80211_H_ */
