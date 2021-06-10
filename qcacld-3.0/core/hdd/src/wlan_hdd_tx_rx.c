@@ -852,7 +852,7 @@ static netdev_tx_t __hdd_hard_start_xmit(struct sk_buff *skb,
 	uint8_t pkt_type = 0;
 	bool is_arp = false;
 	struct wlan_objmgr_vdev *vdev;
-	void *vdev_handle = NULL, *vdev_temp;
+	//void *vdev_handle = NULL, *vdev_temp;
 
 #ifdef QCA_WIFI_FTM
 	if (hdd_get_conparam() == QDF_GLOBAL_FTM_MODE) {
