@@ -2929,6 +2929,36 @@ static void ol_txrx_flush_cache_rx_queue(void)
 	}
 }
 
+/**
+ * tlshim_peer_validity() - determines whether peer is valid or not
+ * @vos_ctx: vos context
+ * @sta_id: station id
+ *
+ * Return: on success return vdev, NULL when peer is invalid/NULL
+ */
+void *tlshim_peer_validity(void *cds_ctx, uint8_t sta_id)
+{
+	struct txrx_tl_shim_ctx *tl_shim = cds_get_context(QDF_MODULE_ID_TLSHIM);
+	struct ol_txrx_peer_t *peer;
+
+	if (!tl_shim) {
+		return NULL;
+	}
+
+	if (sta_id >= WLAN_MAX_STA_COUNT) {
+		return NULL;
+	}
+
+	peer = ol_txrx_peer_find_by_local_id(
+			cds_get_context(QDF_MODULE_ID_TXRX),
+			sta_id);
+	if (!peer) {
+		return NULL;
+	} else {
+		return (void *)peer->vdev;
+	}
+}
+
 /*
  * tlshim_selfpeer_vdev() - get the vdev of self peer
  * @vos_ctx: vos context
