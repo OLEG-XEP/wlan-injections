@@ -4227,6 +4227,9 @@ static const struct net_device_ops wlan_drv_ops = {
 static const struct net_device_ops wlan_mon_drv_ops = {
 	.ndo_open = hdd_mon_open,
 	.ndo_stop = hdd_stop,
+#ifdef CONFIG_HL_SUPPORT
+	.ndo_start_xmit = hdd_hard_start_xmit,
+#endif
 	.ndo_get_stats = hdd_get_stats,
 };
 
@@ -5815,7 +5818,7 @@ struct hdd_adapter *hdd_open_adapter(struct hdd_context *hdd_ctx, uint8_t sessio
 			goto err_free_netdev;
 
 		/* do not disable tx in monitor mode */
-		if (QDF_MONITOR_MODE != cds_get_conparam()) {
+		if (QDF_GLOBAL_MONITOR_MODE != hdd_get_conparam()) {
 		/* Stop the Interface TX queue. */
 		hdd_debug("Disabling queues");
 		wlan_hdd_netif_queue_control(adapter,
