@@ -4227,9 +4227,7 @@ static const struct net_device_ops wlan_drv_ops = {
 static const struct net_device_ops wlan_mon_drv_ops = {
 	.ndo_open = hdd_mon_open,
 	.ndo_stop = hdd_stop,
-#ifdef CONFIG_HL_SUPPORT
 	.ndo_start_xmit = hdd_hard_start_xmit,
-#endif
 	.ndo_get_stats = hdd_get_stats,
 };
 
