@@ -51,8 +51,6 @@
  * the new tx frame.
  */
 
-//enum QDF_GLOBAL_MODE curr_mode = hdd_get_conparam();
-
 static int curr_con_mode1;
 static enum QDF_GLOBAL_MODE hdd_get_conparam1(void)
 {
@@ -1087,7 +1085,7 @@ ol_tx_hl_base(
 		/*
 		* copy radiotap header out first.
 		*/
-		if (QDF_GLOBAL_MONITOR_MODE != hdd_get_conparam1()) {
+		if (QDF_GLOBAL_MONITOR_MODE == hdd_get_conparam1()) {
 		    struct ieee80211_radiotap_header *rthdr;
 		    rthdr = (struct ieee80211_radiotap_header *)(qdf_nbuf_data(msdu));
 		    rtap_len = rthdr->it_len;
@@ -1274,7 +1272,7 @@ ol_tx_hl_base(
 			htt_tx_desc_display(tx_desc->htt_tx_desc);
 
 		/* push radiotap as extra frag */
-		if (QDF_MONITOR_MODE == hdd_get_conparam1()) {
+		if (QDF_GLOBAL_MONITOR_MODE == hdd_get_conparam1()) {
 		    qdf_nbuf_frag_push_head(
 			msdu,
 			rtap_len,
