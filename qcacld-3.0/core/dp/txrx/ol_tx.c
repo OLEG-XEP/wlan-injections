@@ -1087,7 +1087,7 @@ ol_tx_hl_base(
 		/*
 		* copy radiotap header out first.
 		*/
-//		if (QDF_GLOBAL_MONITOR_MODE == cds_get_conparam()) {
+		if (QDF_GLOBAL_MONITOR_MODE == cds_get_conparam()) {
 		    struct ieee80211_radiotap_header *rthdr;
 		    rthdr = (struct ieee80211_radiotap_header *)(qdf_nbuf_data(msdu));
 		    rtap_len = rthdr->it_len;
@@ -1103,7 +1103,7 @@ ol_tx_hl_base(
 		    }
 		    qdf_mem_copy(rtap, rthdr, rtap_len);
 		    qdf_nbuf_pull_head(msdu, rtap_len);
-//		}
+		}
 
 		tx_desc = ol_tx_hl_desc_alloc(pdev, vdev, msdu, &tx_msdu_info);
 
@@ -1275,12 +1275,12 @@ ol_tx_hl_base(
 
 		/* push radiotap as extra frag */
 //		if (QDF_GLOBAL_MONITOR_MODE == cds_get_conparam()) {
-//		    qdf_nbuf_frag_push_head(
-//			msdu,
-//			rtap_len,
-//			(uint8_t *)rtap, /* virtual addr */
-//			0 /* phys addr MSBs - n/a */);
-//			qdf_nbuf_set_frag_is_wordstream(msdu, 1, 1);
+		    qdf_nbuf_frag_push_head(
+			msdu,
+			rtap_len,
+			(uint8_t *)rtap, /* virtual addr */
+			0 /* phys addr MSBs - n/a */);
+			qdf_nbuf_set_frag_is_wordstream(msdu, 1, 1);
 //		}
 
 			ol_tx_enqueue(pdev, txq, tx_desc, &tx_msdu_info);
