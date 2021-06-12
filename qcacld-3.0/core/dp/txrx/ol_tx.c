@@ -1092,6 +1092,9 @@ ol_tx_hl_base(
 		    rthdr = (struct ieee80211_radiotap_header *)(qdf_nbuf_data(msdu));
 		    rtap_len = rthdr->it_len;
 		    if (rtap_len > MAX_RADIOTAP_LEN) {
+			QDF_TRACE(QDF_MODULE_ID_TXRX, QDF_TRACE_LEVEL_ERROR,
+			"radiotap length exceeds %d, drop it!\n",
+			MAX_RADIOTAP_LEN);
 			qdf_nbuf_set_next(msdu, NULL);
 			if (!msdu_drop_list)
 			    msdu_drop_list = msdu;
