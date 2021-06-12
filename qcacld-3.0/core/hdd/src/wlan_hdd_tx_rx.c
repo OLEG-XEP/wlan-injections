@@ -1436,6 +1436,41 @@ static bool hdd_is_arp_local(struct sk_buff *skb)
 	return false;
 }
 
+
+#ifdef CONFIG_HL_SUPPORT
+/*
+ * hdd_move_radiotap_header_forward - move radiotap header to head of skb
+ * @skb: skb to be modified
+ *
+ * For HL monitor mode, radiotap is appended to tail when update radiotap
+ * info in htt layer. Need to copy it ahead of skb before indicating to OS.
+ */
+static void hdd_move_radiotap_header_forward(struct sk_buff *skb)
+{
+	adf_nbuf_t msdu = (adf_nbuf_t)skb;
+	struct ieee80211_radiotap_header *rthdr;
+	uint8_t rtap_len;
+
+	qdf_nbuf_put_tail(msdu,
+		sizeof(struct ieee80211_radiotap_header));
+	rthdr = (struct ieee80211_radiotap_header *)
+	    (qdf_nbuf_data(msdu) + qdf_nbuf_len(msdu) -
+	     sizeof(struct ieee80211_radiotap_header));
+	rtap_len = rthdr->it_len;
+	qdf_nbuf_put_tail(msdu,
+			  rtap_len -
+			  sizeof(struct ieee80211_radiotap_header));
+	qdf_nbuf_push_head(msdu, rtap_len);
+	qdf_mem_copy(qdf_nbuf_data(msdu), rthdr, rtap_len);
+	qdf_nbuf_trim_tail(msdu, rtap_len);
+}
+#else
+static inline void hdd_move_radiotap_header_forward(struct sk_buff *skb)
+{
+    /* no-op */
+}
+#endif
+
 /**
  * hdd_is_rx_wake_lock_needed() - check if wake lock is needed
  * @skb: pointer to sk_buff
