@@ -316,7 +316,7 @@ hdd_skb_nontso_linearize(struct sk_buff *skb)
  * Function Declarations and Documentation
  * -------------------------------------------------------------------------*/
 
-//void *tlshim_peer_validity(void *cds_ctx, uint8_t sta_id);
+void *tlshim_peer_validity(void *cds_ctx, uint8_t sta_id);
 
 /**
  * tlshim_selfpeer_vdev() - get vdev of self peer
@@ -324,7 +324,7 @@ hdd_skb_nontso_linearize(struct sk_buff *skb)
  *
  * Return: on success return vdev, NULL when self peer is invalid/NULL
  */
-//void *tlshim_selfpeer_vdev(void *cds_ctx);
+void *tlshim_selfpeer_vdev(void *cds_ctx);
 
 /*==========================================================================
 

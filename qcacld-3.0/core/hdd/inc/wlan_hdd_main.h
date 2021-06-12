@@ -2072,6 +2072,7 @@ struct hdd_context {
 	qdf_atomic_t cap_tsf_flag;
 	/* the context that is capturing tsf */
 	struct hdd_adapter *cap_tsf_context;
+	struct hdd_adapter *cds_get_context;
 #endif
 	uint8_t bt_a2dp_active:1;
 	uint8_t bt_vo_active:1;

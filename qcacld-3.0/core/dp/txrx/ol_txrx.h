@@ -215,7 +215,7 @@ void ol_txrx_set_tx_compl_tsf64(bool val);
  * Function Declarations and Documentation
  * -------------------------------------------------------------------------*/
 
-//void *tlshim_peer_validity(void *cds_ctx, uint8_t sta_id);
+void *tlshim_peer_validity(void *cds_ctx, uint8_t sta_id);
 
 /**
  * tlshim_selfpeer_vdev() - get vdev of self peer
@@ -223,7 +223,7 @@ void ol_txrx_set_tx_compl_tsf64(bool val);
  *
  * Return: on success return vdev, NULL when self peer is invalid/NULL
  */
-//void *tlshim_selfpeer_vdev(void *cds_ctx);
+void *tlshim_selfpeer_vdev(void *cds_ctx);
 
 /*==========================================================================
 

@@ -2936,7 +2936,7 @@ static void ol_txrx_flush_cache_rx_queue(void)
  *
  * Return: on success return vdev, NULL when peer is invalid/NULL
  */
-/*
+
 void *tlshim_peer_validity(void *cds_ctx, uint8_t sta_id)
 {
 	struct txrx_tl_shim_ctx *tl_shim = cds_get_context(QDF_MODULE_ID_TLSHIM);
@@ -2959,14 +2959,14 @@ void *tlshim_peer_validity(void *cds_ctx, uint8_t sta_id)
 		return (void *)peer->vdev;
 	}
 }
-*/
+
 /*
  * tlshim_selfpeer_vdev() - get the vdev of self peer
  * @vos_ctx: vos context
  *
  * Return: on success return vdev, NULL when self peer is invalid/NULL
  */
-/*
+
 void *tlshim_selfpeer_vdev(void *cds_ctx)
 {
 	struct ol_txrx_pdev_t *pdev = cds_get_context(QDF_MODULE_ID_TXRX);
@@ -2983,7 +2983,6 @@ void *tlshim_selfpeer_vdev(void *cds_ctx)
 		return peer->vdev;
 	}
 }
-*/
 
 /* Define short name to use in cds_trigger_recovery */
 #define PEER_DEL_TIMEOUT QDF_PEER_DELETION_TIMEDOUT

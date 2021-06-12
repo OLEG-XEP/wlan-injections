@@ -852,7 +852,7 @@ static netdev_tx_t __hdd_hard_start_xmit(struct sk_buff *skb,
 	uint8_t pkt_type = 0;
 	bool is_arp = false;
 	struct wlan_objmgr_vdev *vdev;
-	//void *vdev_handle = NULL, *vdev_temp;
+	void *vdev_handle = NULL, *vdev_temp;
 
 #ifdef QCA_WIFI_FTM
 	if (hdd_get_conparam() == QDF_GLOBAL_FTM_MODE) {
@@ -900,6 +900,12 @@ static netdev_tx_t __hdd_hard_start_xmit(struct sk_buff *skb,
 		QDF_TRACE(QDF_MODULE_ID_HDD_DATA, QDF_TRACE_LEVEL_INFO_HIGH,
 			  "Invalid station id, transmit operation suspended");
 		goto drop_pkt;
+	vdev_temp = tlshim_peer_validity(
+			(WLAN_HDD_GET_CTX(adapter))->cds_get_context, STAId);
+	} else {
+	vdev_temp = tlshim_selfpeer_vdev(
+			(WLAN_HDD_GET_CTX(adapter))->cds_get_context);
+	vdev_handle = vdev_temp;
 	}
 
 	hdd_get_tx_resource(adapter, STAId,
