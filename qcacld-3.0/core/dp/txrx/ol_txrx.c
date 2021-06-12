@@ -2950,6 +2950,7 @@ void *tlshim_peer_validity(void *cds_ctx, uint8_t sta_id)
 		return NULL;
 	}
 
+/*
 	peer = ol_txrx_peer_find_by_local_id(
 			cds_get_context(QDF_MODULE_ID_TXRX),
 			sta_id);
@@ -2958,6 +2959,7 @@ void *tlshim_peer_validity(void *cds_ctx, uint8_t sta_id)
 	} else {
 		return (void *)peer->vdev;
 	}
+*/
 }
 
 /*
