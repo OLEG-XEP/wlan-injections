@@ -1084,7 +1084,7 @@ ol_tx_hl_base(
 	 */
 	while (msdu) {
 		qdf_nbuf_t next;
-		qdf_nbuf_t prev_drop;
+//		qdf_nbuf_t prev_drop;
 		struct ol_tx_frms_queue_t *txq;
 		struct ol_tx_desc_t *tx_desc = NULL;
 
