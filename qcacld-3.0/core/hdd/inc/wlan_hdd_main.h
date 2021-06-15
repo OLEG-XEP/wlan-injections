@@ -1838,6 +1838,7 @@ struct hdd_fw_ver_info {
  * @sar_cmd_params: SAR command params to be configured to the FW
  */
 struct hdd_context {
+	struct hdd_adapter *p_cds_context;
 	struct wlan_objmgr_psoc *psoc;
 	struct wlan_objmgr_pdev *pdev;
 	mac_handle_t mac_handle;
@@ -2072,7 +2073,6 @@ struct hdd_context {
 	qdf_atomic_t cap_tsf_flag;
 	/* the context that is capturing tsf */
 	struct hdd_adapter *cap_tsf_context;
-	struct hdd_adapter *cds_get_context;
 #endif
 	uint8_t bt_a2dp_active:1;
 	uint8_t bt_vo_active:1;
@@ -2402,7 +2402,7 @@ QDF_STATUS hdd_adapter_iterate(hdd_adapter_iterate_cb cb,
 #define __hdd_is_adapter_valid(_adapter) !!_adapter
 
 /**
- * hdd_for_each_adapter_dev_held - Adapter iterator with dev_hold called
+ * hdd_for_each_adapter_dev_held - jAdapter iterator with dev_hold called
  * @hdd_ctx: the global HDD context
  * @adapter: an hdd_adapter pointer to use as a cursor
  *

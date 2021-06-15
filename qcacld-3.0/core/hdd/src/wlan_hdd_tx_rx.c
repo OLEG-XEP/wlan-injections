@@ -900,13 +900,17 @@ static netdev_tx_t __hdd_hard_start_xmit(struct sk_buff *skb,
 		QDF_TRACE(QDF_MODULE_ID_HDD_DATA, QDF_TRACE_LEVEL_INFO_HIGH,
 			  "Invalid station id, transmit operation suspended");
 		goto drop_pkt;
+
 	vdev_temp = tlshim_peer_validity(
-			(WLAN_HDD_GET_CTX(adapter))->cds_get_context, STAId);
+			(WLAN_HDD_GET_CTX(adapter))->p_cds_context, STAId);
 	} else {
 	vdev_temp = tlshim_selfpeer_vdev(
-			(WLAN_HDD_GET_CTX(adapter))->cds_get_context);
-	vdev_handle = vdev_temp;
+			(WLAN_HDD_GET_CTX(adapter))->p_cds_context);
 	}
+	if (!vdev_temp)
+                goto drop_pkt;
+
+        vdev_handle = vdev_temp;
 
 	hdd_get_tx_resource(adapter, STAId,
 				WLAN_HDD_TX_FLOW_CONTROL_OS_Q_BLOCK_TIME);

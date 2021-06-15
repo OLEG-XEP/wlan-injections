@@ -1084,7 +1084,7 @@ ol_tx_hl_base(
 	 */
 	while (msdu) {
 		qdf_nbuf_t next;
-//		qdf_nbuf_t prev_drop;
+		qdf_nbuf_t prev_drop;
 		struct ol_tx_frms_queue_t *txq;
 		struct ol_tx_desc_t *tx_desc = NULL;
 
@@ -1109,12 +1109,12 @@ ol_tx_hl_base(
 			"radiotap length exceeds %d, drop it!\n",
 			MAX_RADIOTAP_LEN);
 			ol_tx_drop_list_add(&msdu_drop_list, msdu, &drop_tail);
-/*			qdf_nbuf_set_next(msdu, NULL);
+			qdf_nbuf_set_next(msdu, NULL);
 			if (!msdu_drop_list)
 			    msdu_drop_list = msdu;
 			else
 			    qdf_nbuf_set_next(prev_drop, msdu);
-			prev_drop = msdu; */
+			prev_drop = msdu;
 			msdu = next;
 			continue;
 		    }
