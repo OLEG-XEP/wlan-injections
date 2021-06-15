@@ -6,5 +6,5 @@
 *.tmp
 *.ko
 *.mod
-*.order
-*.symvers
+modules.order
+Module.symvers
