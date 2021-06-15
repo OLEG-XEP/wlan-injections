@@ -1035,6 +1035,18 @@ int ol_txrx_mgmt_send_frame(
 }
 #endif
 
+static void
+ol_tx_drop_list_add(qdf_nbuf_t *list, qdf_nbuf_t msdu, qdf_nbuf_t *tail)
+{
+        qdf_nbuf_set_next(msdu, NULL);
+        if (!*list)
+                *list = msdu;
+        else
+                qdf_nbuf_set_next(*tail, msdu);
+
+        *tail = msdu;
+}
+
 /**
  * ol_tx_hl_base() - send tx frames for a HL system.
  * @vdev: the virtual device sending the data
@@ -1056,6 +1068,7 @@ ol_tx_hl_base(
 	struct ol_txrx_pdev_t *pdev = vdev->pdev;
 	qdf_nbuf_t msdu = msdu_list;
 	qdf_nbuf_t msdu_drop_list = NULL;
+	qdf_nbuf_t drop_tail = NULL;
 	struct ol_txrx_msdu_info_t tx_msdu_info;
 	struct ocb_tx_ctrl_hdr_t tx_ctrl;
 	htt_pdev_handle htt_pdev = pdev->htt_pdev;
@@ -1095,12 +1108,13 @@ ol_tx_hl_base(
 			QDF_TRACE(QDF_MODULE_ID_TXRX, QDF_TRACE_LEVEL_ERROR,
 			"radiotap length exceeds %d, drop it!\n",
 			MAX_RADIOTAP_LEN);
-			qdf_nbuf_set_next(msdu, NULL);
+			ol_tx_drop_list_add(&msdu_drop_list, msdu, &drop_tail);
+/*			qdf_nbuf_set_next(msdu, NULL);
 			if (!msdu_drop_list)
 			    msdu_drop_list = msdu;
 			else
 			    qdf_nbuf_set_next(prev_drop, msdu);
-			prev_drop = msdu;
+			prev_drop = msdu; */
 			msdu = next;
 			continue;
 		    }
@@ -1110,19 +1124,23 @@ ol_tx_hl_base(
 
 		tx_desc = ol_tx_hl_desc_alloc(pdev, vdev, msdu, &tx_msdu_info);
 
-		if (!tx_desc) {
+	    if (!tx_desc) {
 			/*
 			 * If we're out of tx descs, there's no need to try
 			 * to allocate tx descs for the remaining MSDUs.
 			 */
 			TXRX_STATS_MSDU_LIST_INCR(pdev, tx.dropped.host_reject,
 						  msdu);
-			if (!msdu_drop_list)
+	    if (!msdu_drop_list)
                 msdu_drop_list = msdu;
             else
-                qdf_nbuf_set_next(prev_drop, msdu);
+//		qdf_nbuf_set_next(prev_drop, msdu);
+		qdf_nbuf_set_next(drop_tail, msdu);
             return msdu_drop_list; /* the list of unaccepted MSDUs */
 		}
+
+//	tx_desc->rtap_len = rtap_len;
+        qdf_mem_copy(rtap, rtap, rtap_len);
 
 		/* OL_TXRX_PROT_AN_LOG(pdev->prot_an_tx_sent, msdu);*/
 
