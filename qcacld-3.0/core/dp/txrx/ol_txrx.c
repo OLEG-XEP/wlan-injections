@@ -2940,17 +2940,26 @@ static void ol_txrx_flush_cache_rx_queue(void)
 void *tlshim_peer_validity(void *cds_ctx, uint8_t sta_id)
 {
 	struct txrx_tl_shim_ctx *tl_shim = cds_get_context(QDF_MODULE_ID_TLSHIM);
+	struct ol_txrx_pdev_t *pdev = cds_get_context(QDF_MODULE_ID_TXRX);
 	struct ol_txrx_peer_t *peer;
 
 	if (!tl_shim) {
+		WMA_LOGE("tl_shim is NULL");
 		return NULL;
 	}
 
+	if (!pdev) {
+                WMA_LOGE("pdev is NULL");
+                return NULL;
+	}
+
 	if (sta_id >= WLAN_MAX_STA_COUNT) {
+		WMA_LOGE("Invalid sta id for data tx");
 		return NULL;
 	}
 
         if (!peer) {
+                WMA_LOGW("Invalid peer");
                 return NULL;
         } else {
                 return (void *)peer->vdev;
@@ -2971,11 +2980,13 @@ void *tlshim_selfpeer_vdev(void *cds_ctx)
 	struct ol_txrx_peer_t *peer;
 
 	if (!pdev) {
+		WMA_LOGE("Txrx pdev is NULL");
 		return NULL;
 	}
 
 	peer = pdev->self_peer;
 	if (!peer) {
+		WMA_LOGW("Invalid peer");
 		return NULL;
 	} else {
 		return peer->vdev;
