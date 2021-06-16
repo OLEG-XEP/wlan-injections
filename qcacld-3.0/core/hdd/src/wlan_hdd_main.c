@@ -5818,13 +5818,13 @@ struct hdd_adapter *hdd_open_adapter(struct hdd_context *hdd_ctx, uint8_t sessio
 			goto err_free_netdev;
 
 		/* do not disable tx in monitor mode */
-//		if (QDF_GLOBAL_MONITOR_MODE != hdd_get_conparam()) {
+		if (QDF_GLOBAL_MONITOR_MODE != cds_get_conparam()) {
 		/* Stop the Interface TX queue. */
 		hdd_debug("Disabling queues");
 		wlan_hdd_netif_queue_control(adapter,
 					WLAN_STOP_ALL_NETIF_QUEUE_N_CARRIER,
 					WLAN_CONTROL_PATH);
-//		}
+		}
 
 		hdd_nud_init_tracking(adapter);
 		if (adapter->device_mode == QDF_STA_MODE ||
