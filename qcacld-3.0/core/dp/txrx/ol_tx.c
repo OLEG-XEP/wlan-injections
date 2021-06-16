@@ -50,6 +50,22 @@
  * succeeds, that guarantees that the target has room to accept
  * the new tx frame.
  */
+
+/*
+static int curr_con_mode1;
+static enum QDF_GLOBAL_MODE hdd_get_conparam1(void)
+{
+        return (enum QDF_GLOBAL_MODE) curr_con_mode1;
+}
+*/
+
+/*
+static void hdd_set_conparam1(int32_t con_param1)
+{
+        curr_con_mode1 = con_param1;
+}
+*/
+
 struct ol_tx_desc_t *
 ol_tx_prepare_ll(ol_txrx_vdev_handle vdev,
 		 qdf_nbuf_t msdu,
@@ -1019,6 +1035,18 @@ int ol_txrx_mgmt_send_frame(
 }
 #endif
 
+static void
+ol_tx_drop_list_add(qdf_nbuf_t *list, qdf_nbuf_t msdu, qdf_nbuf_t *tail)
+{
+        qdf_nbuf_set_next(msdu, NULL);
+        if (!*list)
+                *list = msdu;
+        else
+                qdf_nbuf_set_next(*tail, msdu);
+
+        *tail = msdu;
+}
+
 /**
  * ol_tx_hl_base() - send tx frames for a HL system.
  * @vdev: the virtual device sending the data
@@ -1028,6 +1056,8 @@ int ol_txrx_mgmt_send_frame(
  *
  * Return: NULL if all MSDUs are accepted
  */
+struct ieee80211_radiotap_header *rthdr;
+#define MAX_RADIOTAP_LEN 256
 static inline qdf_nbuf_t
 ol_tx_hl_base(
 	ol_txrx_vdev_handle vdev,
@@ -1037,10 +1067,13 @@ ol_tx_hl_base(
 {
 	struct ol_txrx_pdev_t *pdev = vdev->pdev;
 	qdf_nbuf_t msdu = msdu_list;
+	qdf_nbuf_t msdu_drop_list = NULL;
+	qdf_nbuf_t drop_tail = NULL;
 	struct ol_txrx_msdu_info_t tx_msdu_info;
 	struct ocb_tx_ctrl_hdr_t tx_ctrl;
 	htt_pdev_handle htt_pdev = pdev->htt_pdev;
-
+	uint8_t rtap[MAX_RADIOTAP_LEN];
+	uint8_t rtap_len = 0;
 	tx_msdu_info.tso_info.is_tso = 0;
 
 	/*
@@ -1051,6 +1084,7 @@ ol_tx_hl_base(
 	 */
 	while (msdu) {
 		qdf_nbuf_t next;
+		qdf_nbuf_t prev_drop;
 		struct ol_tx_frms_queue_t *txq;
 		struct ol_tx_desc_t *tx_desc = NULL;
 
@@ -1063,17 +1097,50 @@ ol_tx_hl_base(
 		 */
 		next = qdf_nbuf_next(msdu);
 
+		/*
+		* copy radiotap header out first.
+		*/
+		if (QDF_GLOBAL_MONITOR_MODE == cds_get_conparam()) {
+//		    struct ieee80211_radiotap_header *rthdr;
+		    rthdr = (struct ieee80211_radiotap_header *)(qdf_nbuf_data(msdu));
+		    rtap_len = rthdr->it_len;
+		    if (rtap_len > MAX_RADIOTAP_LEN) {
+			QDF_TRACE(QDF_MODULE_ID_TXRX, QDF_TRACE_LEVEL_ERROR,
+			"radiotap length exceeds %d, drop it!\n",
+			MAX_RADIOTAP_LEN);
+			ol_tx_drop_list_add(&msdu_drop_list, msdu, &drop_tail);
+			qdf_nbuf_set_next(msdu, NULL);
+			if (!msdu_drop_list)
+			    msdu_drop_list = msdu;
+			else
+			    qdf_nbuf_set_next(prev_drop, msdu);
+			prev_drop = msdu;
+			msdu = next;
+			continue;
+		    }
+		    qdf_mem_copy(rtap, rthdr, rtap_len);
+		    qdf_nbuf_pull_head(msdu, rtap_len);
+		}
+
 		tx_desc = ol_tx_hl_desc_alloc(pdev, vdev, msdu, &tx_msdu_info);
 
-		if (!tx_desc) {
+	    if (!tx_desc) {
 			/*
 			 * If we're out of tx descs, there's no need to try
 			 * to allocate tx descs for the remaining MSDUs.
 			 */
 			TXRX_STATS_MSDU_LIST_INCR(pdev, tx.dropped.host_reject,
 						  msdu);
-			return msdu; /* the list of unaccepted MSDUs */
+	    if (!msdu_drop_list)
+                msdu_drop_list = msdu;
+            else
+//		qdf_nbuf_set_next(prev_drop, msdu);
+		qdf_nbuf_set_next(drop_tail, msdu);
+            return msdu_drop_list; /* the list of unaccepted MSDUs */
 		}
+
+//	tx_desc->rtap_len = rtap_len;
+        qdf_mem_copy(rtap, rtap, rtap_len);
 
 		/* OL_TXRX_PROT_AN_LOG(pdev->prot_an_tx_sent, msdu);*/
 
@@ -1227,6 +1294,16 @@ ol_tx_hl_base(
 			 */
 			htt_tx_desc_display(tx_desc->htt_tx_desc);
 
+		/* push radiotap as extra frag */
+//		if (QDF_GLOBAL_MONITOR_MODE == cds_get_conparam()) {
+		    qdf_nbuf_frag_push_head(
+			msdu,
+			rtap_len,
+			(uint8_t *)rtap, /* virtual addr */
+			0 /* phys addr MSBs - n/a */);
+			qdf_nbuf_set_frag_is_wordstream(msdu, 1, 1);
+//		}
+
 			ol_tx_enqueue(pdev, txq, tx_desc, &tx_msdu_info);
 			if (tx_msdu_info.peer) {
 				OL_TX_PEER_STATS_UPDATE(tx_msdu_info.peer,
@@ -1240,7 +1317,7 @@ MSDU_LOOP_BOTTOM:
 			msdu = next;
 		}
 		ol_tx_sched(pdev);
-		return NULL; /* all MSDUs were accepted */
+		return msdu_drop_list; /* all MSDUs were accepted */
 }
 
 qdf_nbuf_t
