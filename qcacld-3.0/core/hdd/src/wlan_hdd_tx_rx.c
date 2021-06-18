@@ -852,7 +852,7 @@ static netdev_tx_t __hdd_hard_start_xmit(struct sk_buff *skb,
 	uint8_t pkt_type = 0;
 	bool is_arp = false;
 	struct wlan_objmgr_vdev *vdev;
-	void *vdev_handle = NULL, *vdev_temp;
+//	void *vdev_handle = NULL, *vdev_temp;
 
 #ifdef QCA_WIFI_FTM
 	if (hdd_get_conparam() == QDF_GLOBAL_FTM_MODE) {
@@ -896,15 +896,15 @@ static netdev_tx_t __hdd_hard_start_xmit(struct sk_buff *skb,
 	STAId = HDD_WLAN_INVALID_STA_ID;
 
 	/* use self peer directly in monitor mode */
-	if (QDF_GLOBAL_MONITOR_MODE != cds_get_conparam()) {
-	hdd_get_transmit_sta_id(adapter, skb, &STAId);
-	if (STAId >= WLAN_MAX_STA_COUNT) {
+//	if (QDF_MONITOR_MODE != cds_get_conparam()) {
+	    hdd_get_transmit_sta_id(adapter, skb, &STAId);
+	    if (STAId >= WLAN_MAX_STA_COUNT) {
 		QDF_TRACE(QDF_MODULE_ID_HDD_DATA, QDF_TRACE_LEVEL_INFO_HIGH,
 			  "Invalid station id, transmit operation suspended");
 		goto drop_pkt;
-	}
+	    }
 
-	vdev_temp = tlshim_peer_validity(
+/*	vdev_temp = tlshim_peer_validity(
 			(WLAN_HDD_GET_CTX(adapter))->p_cds_context, STAId);
 	} else {
 	vdev_temp = tlshim_selfpeer_vdev(
@@ -914,7 +914,7 @@ static netdev_tx_t __hdd_hard_start_xmit(struct sk_buff *skb,
                 goto drop_pkt;
 
         vdev_handle = vdev_temp;
-
+*/
 	hdd_get_tx_resource(adapter, STAId,
 				WLAN_HDD_TX_FLOW_CONTROL_OS_Q_BLOCK_TIME);
 
@@ -1092,6 +1092,12 @@ drop_pkt:
 			      QDF_TX);
 	kfree_skb(skb);
 
+/*	if (!vdev_handle) {
+       QDF_TRACE(QDF_MODULE_ID_HDD_SAP_DATA, QDF_TRACE_LEVEL_INFO,
+                 "%s: All packets dropped in the list", __func__);
+       return NETDEV_TX_OK;
+	}
+**/
 drop_pkt_accounting:
 
 	++adapter->stats.tx_dropped;
